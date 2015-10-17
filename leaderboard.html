@@ -1,0 +1,186 @@
+<head>
+    <title>911 Feed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Hind:400,600' rel='stylesheet' type='text/css'>
+</head>
+
+<template name="main">
+    {{#if isTV}}{{> desktop}}{{/if}} {{#if isTablet}}{{> desktop}}{{/if}} {{#if isPhone}}{{> yield}}{{/if}} {{#if isDesktop}}{{> yield "desktop"}}{{/if}} {{#if isBot}}{{> desktop}}{{/if}}
+    <script>
+        $.material.init()
+    </script>
+</template>
+
+<template name="desktop">
+
+    <div class="navbar navbar-black" style="width: 100vw; padding-right: 40px;position:fixed; left:0px; top:0px;">
+
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="" class="size" id="down"><i class="fa fa-font" style="font-size:0.7em;"></i></a>
+            </li>
+            <li><a href="" class="size" id="up"><i class="fa fa-font" style="font-size:1em;"></i></a>
+            </li>
+            <li class="dropdown">
+                <a href="#" data-target="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-clock-o"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="" id="six">6 Hours</a>
+                    </li>
+                    <li><a href="" id="twelve">12 Hours</a>
+                    </li>
+                    <li><a href="" id="eighteen">18 Hours</a>
+                    </li>
+                    <li><a href="" id="twentyfour">24 Hours</a>
+                    </li>
+                    <li>
+                        <input id="datetimepicker3" type="text" style="display:none;">
+
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" data-target="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-list-ul"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="" id="show_all">Show ALL</a>
+                    </li>
+                    <li><a href="" id="aid_only">Aid Calls ONLY</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+
+    <div class="wrap" id="containMe">
+
+
+
+        <table class="uk-table uk-table-striped">
+            {{#each dispatches}} {{> dispatch}} {{/each}}
+        </table>
+
+    </div>
+
+    <script>
+        $('.size').on('click', function () {
+            var clicked = this;
+            $('#containMe').css('font-size', function (i, size) {
+                console.log(parseInt(size, 10), clicked.id);
+                return parseInt(size, 10) + (clicked.id === 'up' ? 2 : -2) + 'px';
+            });
+        });
+    </script>
+    <script>
+        jQuery('#datetimepicker3').datetimepicker({
+            timepicker: false,
+            format: 'm-d-Y',
+            inline: true,
+            lang: 'en',
+            onChangeDateTime: function (dp, $input) {
+                Session.set('time', $input.val() + ' at 00:00');
+                Session.set('time2', $input.val() + ' at 23:59');
+                Meteor.subscribe('dispatch', {
+                    'time': Session.get('time')
+                }, {
+                    'time2': Session.get('time2')
+                });
+            }
+        });
+    </script>
+</template>
+
+<template name="mobile">
+    <div id="Container">
+
+        {{#each dispatches}} {{> mobilecalls}} {{/each}}
+    </div>
+</template>
+
+<template name="mobileapple">
+    <div id="Container">
+        {{#each dispatches}} {{> mobilecallsapple}} {{/each}}
+    </div>
+</template>
+
+<template name="mobilecallsapple">
+    {{#AnimateWithVelocity}}
+    <div class="mix other {{Category}}" data-animate data-property="opacity" data-duration="1000" data-from-value="0" data-to-value="1">
+        <div class="flexy">
+            <div>
+                <strong>{{Type}}</strong>
+            </div>
+            <div style="position:absolute;right:3px;">
+                <strong>
+                {{Timestamp}}
+               </strong>
+            </div>
+        </div>
+        <div class="flexy">
+            <div>
+                {{#if place_name.length}}
+
+                <span class="red"><strong>{{place_name}}</strong></span> {{#if unit_num.length}} &nbsp;&raquo;&nbsp;
+                <strong><span class="blue">{{unit_num}}</span></strong>
+                <br>{{else}}
+                <br>{{/if}}{{else}} {{#if unit_num.length}}
+                <strong><span class="blue">{{unit_num}}</span></strong>
+                <br>{{/if}} {{/if}}
+                <a href="http://maps.apple.com/?q={{Coordinates}}" class="address" target="_blank">{{Address}}</a>
+                <br>
+                <strong>{{Department}}</strong>&nbsp;&nbsp;&raquo;&nbsp;&nbsp;{{_ "toSentence" Units ", " " & "}}
+
+            </div>
+        </div>
+    </div>
+    {{/AnimateWithVelocity}}
+
+</template>
+
+<template name="mobilecalls">
+    {{#AnimateWithVelocity}}
+    <div class="mix other {{Category}}" data-animate data-property="opacity" data-duration="1000" data-from-value="0" data-to-value="1">
+        <div class="flexy">
+            <div>
+                <strong>{{Type}}</strong>
+            </div>
+            <div style="position:absolute;right:3px;">
+                <strong>
+                {{Timestamp}}
+               </strong>
+            </div>
+        </div>
+        <div class="flexy">
+            <div>
+                {{#if place_name.length}}
+
+                <span class="red"><strong>{{place_name}}</strong></span> {{#if unit_num.length}} &nbsp;&raquo;&nbsp;
+                <strong><span class="blue">{{unit_num}}</span></strong>
+                <br>{{else}}
+                <br>{{/if}}{{else}} {{#if unit_num.length}}
+                <strong><span class="blue">{{unit_num}}</span></strong>
+                <br>{{/if}} {{/if}}
+                <a href="https://google.com/maps/place/{{Coordinates}}" class="address" target="_blank">{{Address}}</a>
+                <br>
+                <strong>{{Department}}</strong>&nbsp;&nbsp;&raquo;&nbsp;&nbsp;{{_ "toSentence" Units ", " " & "}}
+
+            </div>
+        </div>
+    </div>
+    {{/AnimateWithVelocity}}
+
+</template>
+
+<template name="dispatch">
+    {{#AnimateWithVelocity}}
+    <tr data-animate data-property="opacity" data-duration="1000" data-from-value="0" data-to-value="1">
+        <td id="wrapMe"><b>{{Type}}</b>
+        </td>
+        <td style="min-width:40vw">
+            <a href="https://google.com/maps/place/{{Coordinates}}" class="address" target="_blank">
+                {{#if place_name.length}}<span class="red"><strong>{{place_name}}</strong></span>&nbsp;&raquo;&nbsp;{{/if}}{{#if unit_num.length}}<strong><span class="blue">{{unit_num}}</span></strong>&nbsp;&raquo;&nbsp;{{/if}}{{Address}}
+            </a>
+        </td>
+        <td style="max-width:20vw"><strong>{{Department}}</strong>&nbsp;&raquo;&nbsp;{{_ "toSentence" Units ", " " & "}}</td>
+        <td>{{Timestamp}}</td>
+    </tr>
+    {{/AnimateWithVelocity}}
+</template>
